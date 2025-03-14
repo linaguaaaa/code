@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+>
+  <h:head>
+    <title>Mes coordonnées</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f8f9fa;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        width: 60%;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        align-items: flex-start;
+      }
+      .left {
+        width: 100%;
+        margin-bottom: 30px;
+      }
+      .right {
+        text-align: center;
+        width: 35%;
+        margin-left: 40px;
+        margin-top: 80px;
+      }
+      .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        width: 100%;
+      }
+      .label {
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .field {
+        background: #eee;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        position: relative;
+      }
+      .field input {
+        border: none;
+        background: none;
+        width: 100%;
+        font-size: 16px;
+        display: block;
+        color: #333;
+      }
+      #edit-btn {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #007bff;
+        transition: color 0.3s ease-in-out;
+      }
+
+      #edit-btn:hover {
+        color: #0056b3;
+      }
+
+      .editable {
+        border: 1px solid #ccc !important;
+      }
+      .icons a {
+        display: inline-block;
+        margin: 10px;
+        font-size: 20px;
+        color: #007bff;
+      }
+      .profile-pic {
+        width: 80px;
+        height: 80px;
+        background: #ddd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin: auto;
+      }
+      .actions {
+        background: #f1f1f1;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+      .actions a {
+        display: block;
+        margin: 5px 0;
+        color: #007bff;
+        text-decoration: none;
+      }
+      .buttons {
+        display: none;
+        margin-top: 10px;
+      }
+      .buttons button {
+        margin: 5px;
+        adding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .confirm-btn {
+        background: #28a745;
+        color: white;
+      }
+      .cancel-btn {
+        background: #dc3545;
+        color: white;
+      }
+    </style>
+  </h:head>
+
+  <h:body>
+    <h:form>
+      <div class="container">
+        <div class="left">
+          <div class="info">
+            <h2>Mes coordonnées</h2>
+            <h:commandButton
+              id="edit-btn"
+              value="✏"
+              styleClass="edit-btn"
+              action="#{profileBean.toggleEdit}"
+            />
+          </div>
+
+          <h:outputLabel for="nom" value="Nom" />
+          <h:inputText
+            id="nom"
+            value="#{profileBean.nom}"
+            disabled="#{!profileBean.editable}"
+          />
+
+          <h:outputLabel for="titre" value="Titre" />
+          <h:inputText
+            id="titre"
+            value="#{profileBean.titre}"
+            disabled="#{!profileBean.editable}"
+          />
+
+          <h:outputLabel for="service" value="Service" />
+          <h:inputText
+            id="service"
+            value="#{profileBean.service}"
+            disabled="true"
+          />
+
+          <h:outputLabel for="statut" value="Historique du statut" />
+          <h:inputText
+            id="statut"
+            value="#{profileBean.statut}"
+            disabled="true"
+          />
+
+          <h:outputLabel for="email" value="Email" />
+          <h:inputText
+            id="email"
+            value="#{profileBean.email}"
+            disabled="true"
+          />
+
+          <h:outputLabel for="phone" value="Téléphone" />
+          <h:inputText
+            id="phone"
+            value="#{profileBean.phone}"
+            disabled="true"
+          />
+
+          <div class="buttons" id="buttons" rendered="#{profileBean.editable}">
+            <h:commandButton
+              value="Confirmer"
+              action="#{profileBean.confirmChanges}"
+              styleClass="confirm-btn"
+            />
+            <h:commandButton
+              value="Annuler"
+              action="#{profileBean.cancelChanges}"
+              styleClass="cancel-btn"
+              immediate="true"
+            />
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="profile-pic">👤</div>
+          <p>
+            <strong>#{profileBean.nom}</strong><br />
+            <span>#{profileBean.titre}</span>
+          </p>
+          <div class="icons">
+            <h:commandLink action="#{profileBean.openEmail}"
+              ><i class="fas fa-envelope"></i
+            ></h:commandLink>
+            <h:commandLink action="#{profileBean.openPhoneCall}"
+              ><i class="fas fa-phone"></i
+            ></h:commandLink>
+          </div>
+          <div class="actions">
+            <h:outputLink value="#">⏳ Timesheet</h:outputLink>
+            <h:outputLink value="#">📂 CV</h:outputLink>
+          </div>
+        </div>
+      </div>
+    </h:form>
+    <script>
+      let originalValues = {};
+
+      function toggleEdit() {
+        const inputs = document.querySelectorAll(".field input");
+        const buttons = document.getElementById("buttons");
+
+        inputs.forEach((input) => {
+          if (input.disabled) {
+            originalValues[input.id] = input.value;
+            input.disabled = false;
+            input.classList.add("editable");
+          } else {
+            input.disabled = true;
+            input.classList.remove("editable");
+          }
+        });
+
+        buttons.style.display = inputs[0].disabled ? "none" : "block";
+      }
+
+      function confirmChanges() {
+        let valid = true;
+        document.querySelectorAll(".field input").forEach((input) => {
+          if (input.value.trim() === "") {
+            alert("Tous les champs doivent être remplis.");
+            valid = false;
+          }
+        });
+        if (!valid) return;
+
+        document.querySelectorAll(".field input").forEach((input) => {
+          input.disabled = true;
+          input.classList.remove("editable");
+        });
+        document.getElementById("buttons").style.display = "none";
+      }
+
+      function cancelChanges() {
+        document.querySelectorAll(".field input").forEach((input) => {
+          input.value = originalValues[input.id];
+          input.disabled = true;
+          input.classList.remove("editable");
+        });
+        document.getElementById("buttons").style.display = "none";
+        updateProfile();
+      }
+
+      function updateProfile() {
+        document.getElementById("profile-name").textContent =
+          document.getElementById("nom").value;
+        document.getElementById("profile-title").textContent =
+          document.getElementById("titre").value;
+      }
+    </script>
+    <script>
+      function openEmail() {
+        let email = document.getElementById("email").value;
+        let emailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
+        window.open(emailUrl, "_blank");
+      }
+
+      function openPhoneCall() {
+        let phone = document.getElementById("phone").value;
+        window.location.href = `tel:${phone}`;
+      }
+    </script>
+  </h:body>
+</html>
